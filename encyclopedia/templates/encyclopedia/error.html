@@ -1,0 +1,19 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+{{ title_name }} 
+{% endblock %}
+
+{% block body %}
+
+    <h1> Unfortunately there is no page with title : {{ title_name }} </h1>
+
+    <h1>All available Pages : </h1>
+
+    <ul>
+        {% for entry in entries %}
+            <li> <a href="{% url 'wiki:go_to_publication' title=entry %}"> {{ entry }} </a> </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

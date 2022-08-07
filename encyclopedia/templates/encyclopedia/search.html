@@ -1,0 +1,19 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+{{ title_name }} 
+{% endblock %}
+
+{% block body %}
+
+    <h1> there is no articlle with name : {{ title_name }}  </h1>
+
+    <h1>But here are some articlles with similar names </h1>
+
+    <ul>
+        {% for entry in related_titles %}
+            <li> <a href="{% url 'wiki:go_to_publication' title=entry %}"> {{ entry }} </a> </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
