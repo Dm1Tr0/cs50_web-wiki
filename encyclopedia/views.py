@@ -4,15 +4,15 @@ from django.http import HttpResponseRedirect
 from django import forms
 from django.urls import reverse
 from django.contrib import messages
+import random
+from markdown2 import Markdown
 
 from . import util
 
 class EditForm(forms.Form):
-  """ Form Class for Editing Entries """
   text = forms.CharField(label='', widget=forms.Textarea(attrs={
       "placeholder": "Enter Page Content using Github Markdown"
     }))
-
 
 class SearchForm(forms.Form):
     title = forms.CharField(label='', widget=forms.TextInput(attrs={
@@ -20,7 +20,6 @@ class SearchForm(forms.Form):
       "placeholder": "Wiki Search"}))
 
 class CreateForm(forms.Form):
-    """ Form Class for Creating New Entries """
     title = forms.CharField(label='', widget=forms.TextInput(attrs={
       "placeholder": "Page Title"}))
     text = forms.CharField(label='', widget=forms.Textarea(attrs={
@@ -37,7 +36,7 @@ def go_to_publication(request, title):
     the_article_data_md = util.get_entry(title)
 
     if the_article_data_md:
-        the_article_data_html = the_article_data_md
+        the_article_data_html = Markdown().convert(the_article_data_md)
         return render(request, "encyclopedia/publication.html", {
             "the_article_data": the_article_data_html,
             "title_name": title,
@@ -149,6 +148,14 @@ def edit(request, title):
         "search_form": SearchForm()
     })
 
+def random_title(request):
+
+    # Get list of titles, pick one at random:
+    titles = util.list_entries()
+    title = random.choice(titles)
+
+    # Redirect to selected page:
+    return redirect(reverse('wiki:go_to_publication', args=[title]))
 
 
 
