@@ -1,0 +1,25 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Create an article
+{% endblock %}
+
+{% block body %}
+    <h1>New article</h1>
+
+    {% if not existing_page %}
+        <form action="{% url 'wiki:create' %}" method="post">
+            {% csrf_token %}
+            {{ form_article }}
+            {{ create_form }}
+            <input class= "btn-primary" type="submit" value="create">
+        </form>
+
+    {% else %}
+    <h3> The article already exists, here: </h3>
+        <ul>   
+            <li> <a href="{% url 'wiki:go_to_publication' title=existing_page %}"> {{ existing_page }} </a> </li>
+        </ul>
+    {% endif %}
+
+{% endblock %}
