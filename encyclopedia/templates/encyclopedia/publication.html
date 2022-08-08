@@ -6,5 +6,11 @@
 
 {% block body %}
         <h1>{{ title_name }}</h1>
-        {{ the_article_data }}
+
+        <div id="article">
+            {{ the_article_data }}
+        </div>
+        <a href="{% url 'wiki:edit' title=title_name %}"> edit </a>
+
 {% endblock %}
+

@@ -3,13 +3,29 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django import forms
 from django.urls import reverse
+from django.contrib import messages
 
 from . import util
+
+class EditForm(forms.Form):
+  """ Form Class for Editing Entries """
+  text = forms.CharField(label='', widget=forms.Textarea(attrs={
+      "placeholder": "Enter Page Content using Github Markdown"
+    }))
+
 
 class SearchForm(forms.Form):
     title = forms.CharField(label='', widget=forms.TextInput(attrs={
       "class": "search",
       "placeholder": "Wiki Search"}))
+
+class CreateForm(forms.Form):
+    """ Form Class for Creating New Entries """
+    title = forms.CharField(label='', widget=forms.TextInput(attrs={
+      "placeholder": "Page Title"}))
+    text = forms.CharField(label='', widget=forms.Textarea(attrs={
+      "placeholder": "Enter Page Content using Github Markdown"
+    }))
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -58,9 +74,82 @@ def search(request):
                 "related_titles": related_titles,
                 "form": SearchForm()
                 })
+        # othervice the form is not valid
+        else:
+             return render(request, "encyclopedia/search.html", {
+                "title_name": title,
+                "related_titles": related_titles,
+                "form": form
+                })
+    
 
-    # Otherwise form not posted or form not valid, return to index page:
-    return redirect(reverse('wiki:index'))
+def create(request):
+
+    if request.method == "POST":
+        form = CreateForm(request.POST)
+
+        if form.is_valid():
+          title = form.cleaned_data['title']
+          text = form.cleaned_data['text']
+        else:
+            messages.error(request,"something went worog, pleas check the input data")
+            return render(request, "encyclopedia/create.html", {
+                "form_article": form,
+                "form_search": SearchForm()
+                })
+
+        if  util.get_entry(title):
+            messages.error(request, 'The page with the same name exists')
+            return render(request, "encyclopedia/create.html", {
+              "create_form": form,
+              "search_form": SearchForm(),
+              "existing_page": title
+            })
+
+        util.save_entry(title, text)
+        messages.success(request, f'New page "{title}" created successfully!')
+        return redirect(reverse('wiki:go_to_publication', args=[title]))
+
+    # case of get request
+    return render(request, "encyclopedia/create.html", {
+        "create_form": CreateForm(),
+        "form": SearchForm()
+        })
+
+def edit(request, title):
+    """ Lets users edit an already existing page on the wiki """
+
+    if request.method == "POST":
+        form = EditForm(request.POST)
+
+        if form.is_valid():
+          text = form.cleaned_data['text']
+          util.save_entry(title, text)
+          messages.success(request, f'Entry "{title}" updated successfully!')
+          return redirect(reverse('wiki:go_to_publication', args=[title]))
+
+        else:
+          messages.error(request, f'Editing form not valid, please try again!')
+          return render(request, "encyclopedia/edit.html", {
+            "title": title,
+            "edit_form": form,
+            "search_form": SearchForm()
+          })
+
+    text = util.get_entry(title)
+
+    # If title does not exist, return to index with error:
+    if text == None:
+        messages.error(request, f'"{title}"" page does not exist and can\'t be edited, please create a new page instead!')
+
+    # Otherwise return pre-populated form:
+    return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "edit_form": EditForm(initial={'text':text}),
+        "search_form": SearchForm()
+    })
+
+
 
 
 

@@ -14,18 +14,30 @@ h1 {
 }
 
 textarea {
-    height: 90vh;
-    width: 80%;
+    margin: 10px 0 10px 0;
+    height: 65vh;
+    width: 99%;
+    display: block;
+}
+
+.btn-primary {
+    width: 99%;
+    font-size: 15px;
+    line-height: 15px;
+    display: block;
+}
+
+#id_title {
+    width: 99%;
+}
+
+#article {
+    width: 99%;
+    height: auto;
 }
 
 .main {
     padding: 10px;
-}
-
-.search {
-    width: 100%;
-    font-size: 15px;
-    line-height: 15px;
 }
 
 .sidebar {
@@ -36,4 +48,5 @@ textarea {
 
 .sidebar h2 {
     margin-top: 5px;
+    text-align: center;
 }
